@@ -1,26 +1,88 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Brand & Accent Colors */
+  --golden-wheat: #dba860;
+  --warm-brown: #aa7446;
+  --deep-brown: #2b0a0a;
+  --forest-green: #344e41;
+  --light-sand: #ecd3af;
+  --soft-gray: #f2f2f2;
+  --white: #ffffff;
+  --black: #000000;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Theme Assignments */
+  --background: var(--soft-gray);
+  --foreground: var(--black);
+  --accent: var(--golden-wheat);
+  --heading: var(--deep-brown);
+  --card-background: var(--white);
+  --section-bg: var(--light-sand);
+  --button-primary: var(--warm-brown);
+  --button-secondary: var(--deep-brown);
+  --icon-accent: var(--golden-wheat);
+
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Open Sans', Arial, Helvetica, sans-serif;
+  --font-callout: 'Georgia', serif;
+  --glass-bg: rgba(255,255,255,0.7);
+  --glass-blur: 16px;
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+  --text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --gradient-hero: linear-gradient(135deg, #f2f2f2 0%, #ecd3af 100%);
+  --gradient-accent: linear-gradient(90deg, #dba860 0%, #aa7446 100%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--deep-brown);
+    --foreground: var(--white);
+    --heading: var(--golden-wheat);
+    --card-background: #232323;
+    --section-bg: #232323;
+    --button-primary: var(--golden-wheat);
+    --button-secondary: var(--golden-wheat);
+    --icon-accent: var(--golden-wheat);
   }
 }
 
 body {
+  font-family: var(--font-body);
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  text-shadow: var(--text-shadow);
 }
+
+/* Glassmorphism card utility */
+.glass-card {
+  background: var(--glass-bg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* Gradient backgrounds */
+.bg-hero-gradient {
+  background: var(--gradient-hero);
+}
+.bg-accent-gradient {
+  background: var(--gradient-accent);
+}
+
+/* Text shadow utility */
+.text-shadow {
+  text-shadow: var(--text-shadow);
+}
+
+/* Utility classes for backgrounds */
+.bg-accent { background: var(--accent); }
+.bg-section { background: var(--section-bg); }
+.bg-card { background: var(--card-background); }
+
+/* Utility classes for text */
+.text-heading { color: var(--heading); font-family: var(--font-heading); }
+.text-callout { color: var(--accent); font-family: var(--font-callout); font-style: italic; }

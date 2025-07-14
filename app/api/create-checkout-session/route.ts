@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2022-11-15' });
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body = await req.json()
   const { mode, email, name, phone, address, service, message } = body;
 
   // Send email with form info using Brevo SMTP

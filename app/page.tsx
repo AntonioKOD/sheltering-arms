@@ -54,27 +54,6 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-[#f2f2f2] relative overflow-x-hidden">
       <SecureMyPlaceModal open={modalOpen} onClose={() => setModalOpen(false)} />
-      {/* Top Header Bar */}
-      <div className="bg-[#dba860] text-white py-2 px-4 text-shadow">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
-          <div className="flex items-center space-x-6">
-            <span>Contact: +1-02 836 214 3699 | rapture-readiness.com</span>
-          </div>
-          <div className="flex items-center space-x-6">
-            <span>Warmth. Faith. Assurance.</span>
-            <div className="flex items-center space-x-2">
-              <span>Follow Us:</span>
-              <div className="flex space-x-2">
-                <Facebook className="w-4 h-4" />
-                <Instagram className="w-4 h-4" />
-                <Twitter className="w-4 h-4" />
-                <Youtube className="w-4 h-4" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Hero Section with floating icons */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}

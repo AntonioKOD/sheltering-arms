@@ -2,8 +2,10 @@
 import { Button } from "@/components/ui/button"
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react"
 import { motion, useAnimation } from "framer-motion"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { CrossIcon, DoveIcon, PrayingHandsIcon, HaloIcon } from "./icons"
+// Removed PayPalButtons import
+import SecureMyPlaceModal from "./components/SecureMyPlaceModal";
 
 export default function Page() {
   // Animation controls for advanced effects
@@ -13,16 +15,45 @@ export default function Page() {
   const videoControls = useAnimation()
   const bottomControls = useAnimation()
 
+  const [donating, setDonating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleDonate = async () => {
+    setDonating(true);
+    try {
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'donation' }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Error creating Stripe session: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert('Error: ' + err.message);
+      } else {
+        alert('An unknown error occurred.');
+      }
+    } finally {
+      setDonating(false);
+    }
+  };
+
   useEffect(() => {
     heroControls.start({ opacity: 1, y: 0, transition: { duration: 1, delay: 0.1 } })
     aboutControls.start({ opacity: 1, y: 0, transition: { duration: 1, delay: 0.2 } })
     donationControls.start({ opacity: 1, y: 0, transition: { duration: 1, delay: 0.3 } })
     videoControls.start({ opacity: 1, y: 0, transition: { duration: 1, delay: 0.4 } })
     bottomControls.start({ opacity: 1, y: 0, transition: { duration: 1, delay: 0.5 } })
-  }, [])
+  }, [heroControls, aboutControls, donationControls, videoControls, bottomControls])
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] relative overflow-x-hidden">
+      <SecureMyPlaceModal open={modalOpen} onClose={() => setModalOpen(false)} />
       {/* Top Header Bar */}
       <div className="bg-[#dba860] text-white py-2 px-4 text-shadow">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
@@ -181,7 +212,12 @@ export default function Page() {
             </div>
           </div>
           <div className="text-center">
-            <Button className="bg-gradient-to-r from-[#dba860] to-[#aa7446] hover:from-[#aa7446] hover:to-[#dba860] text-white px-10 py-4 text-lg rounded-full shadow-lg transition-all duration-200 drop-shadow-lg">Reserve My Place</Button>
+            <Button
+              className="bg-gradient-to-r from-[#dba860] to-[#aa7446] hover:from-[#aa7446] hover:to-[#dba860] text-white px-10 py-4 text-lg rounded-full shadow-lg transition-all duration-200 drop-shadow-lg"
+              onClick={() => setModalOpen(true)}
+            >
+              Secure My Place
+            </Button>
           </div>
         </div>
       </motion.div>
@@ -273,7 +309,12 @@ export default function Page() {
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4 text-[#2b0a0a] text-shadow">Be Ready. Be at Peace.</h2>
           <p className="text-lg mb-8 text-[#2b0a0a]">Your faith has prepared your soul. Let us help you prepare everything else.</p>
-          <Button className="bg-gradient-to-r from-[#dba860] to-[#aa7446] hover:from-[#aa7446] hover:to-[#dba860] text-white px-10 py-4 text-lg rounded-full shadow-lg transition-all duration-200">Reserve Your Plan Now</Button>
+          <Button
+            className="bg-gradient-to-r from-[#dba860] to-[#aa7446] hover:from-[#aa7446] hover:to-[#dba860] text-white px-10 py-4 text-lg rounded-full shadow-lg transition-all duration-200"
+            onClick={() => setModalOpen(true)}
+          >
+            Secure My Place
+          </Button>
         </div>
       </motion.div>
 
@@ -289,11 +330,11 @@ export default function Page() {
           <a href="#" className="hover:underline"><Youtube className="inline w-4 h-4" /></a>
         </div>
         <button
+          onClick={handleDonate}
+          disabled={donating}
           className="bg-gradient-to-r from-[#dba860] to-[#aa7446] hover:from-[#aa7446] hover:to-[#dba860] text-white px-8 py-3 text-lg rounded-full shadow-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] mb-2"
-          type="button"
-          onClick={() => window.open('https://buy.stripe.com/test_dR6cNw0wQ0wQ0w0cMN', '_blank')}
         >
-          Donate
+          {donating ? 'Redirecting...' : 'Donate $20'}
         </button>
         <div className="text-center text-callout">“May the peace of God, which surpasses all understanding, guard your hearts and your minds.”</div>
         <div>&copy; {new Date().getFullYear()} Sheltering Arms. All rights reserved.</div>

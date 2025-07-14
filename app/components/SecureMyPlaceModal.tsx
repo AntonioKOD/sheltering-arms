@@ -1,33 +1,56 @@
 "use client";
 
 import React, { useState } from 'react';
-
-const SERVICE_OPTIONS = [
-  'Pet Care',
-  'Home Care',
-  'Final Wishes',
-  'Other',
-];
+// Removed PayPalButtons import
 
 export default function SecureMyPlaceModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
+    address: '',
     service: '',
     message: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  // Removed initialPaid and subscriptionActive state
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    // For now, redirect to Stripe Checkout (replace with your real link)
-    window.location.href = 'https://buy.stripe.com/test_7sI3fQ0wQ0wQ0w0cMN';
+    try {
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'plan',
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          address: form.address,
+          service: form.service,
+          message: form.message,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Error creating Stripe session: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert('Error: ' + err.message);
+      } else {
+        alert('An unknown error occurred.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!open) return null;
@@ -47,13 +70,14 @@ export default function SecureMyPlaceModal({ open, onClose }: { open: boolean; o
           We cannot predict when or whether the rapture will occur. We will provide these services if and when it happens.<br />
           <span className='block text-yellow-700 mt-2 font-bold'>We are currently accepting a limited number of reservations. 2,000 spots available.</span>
         </div>
+        {/* Stripe payment flow placeholder */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block mb-1 font-semibold" htmlFor="name">Name</label>
             <input
-              type="text"
               id="name"
               name="name"
+              type="text"
               required
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] bg-white/80 text-black"
               value={form.name}
@@ -63,9 +87,9 @@ export default function SecureMyPlaceModal({ open, onClose }: { open: boolean; o
           <div>
             <label className="block mb-1 font-semibold" htmlFor="email">Email</label>
             <input
-              type="email"
               id="email"
               name="email"
+              type="email"
               required
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] bg-white/80 text-black"
               value={form.email}
@@ -73,18 +97,31 @@ export default function SecureMyPlaceModal({ open, onClose }: { open: boolean; o
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold" htmlFor="phone">Phone (optional)</label>
+            <label className="block mb-1 font-semibold" htmlFor="phone">Phone</label>
             <input
-              type="tel"
               id="phone"
               name="phone"
+              type="tel"
+              required
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] bg-white/80 text-black"
               value={form.phone}
               onChange={handleChange}
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold" htmlFor="service">What do you want help with?</label>
+            <label className="block mb-1 font-semibold" htmlFor="address">Address</label>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              required
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] bg-white/80 text-black"
+              value={form.address}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-semibold" htmlFor="service">Service</label>
             <select
               id="service"
               name="service"
@@ -94,9 +131,7 @@ export default function SecureMyPlaceModal({ open, onClose }: { open: boolean; o
               onChange={handleChange}
             >
               <option value="" disabled>Select a service</option>
-              {SERVICE_OPTIONS.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
+              <option value="Sheltering Arms Package">Sheltering Arms Package</option>
             </select>
           </div>
           <div>
